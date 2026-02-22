@@ -15,7 +15,7 @@
 ## Структура репозитория
 * index.html — основной код веб-интерфейса и логика работы ИИ-модели.
 * README.md — документация проекта.
-* ссылка на наш сайт: https://teachablemachine.withgoogle.com/models/12f_3hU3C/
+* ссылка на наш сайт: http://orbitscanai.tilda.ws/
 
 ---
 Разработано для конкурса AEROO Space AI.
