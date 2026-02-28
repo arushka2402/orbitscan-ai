@@ -1,6 +1,6 @@
 <div id="ai-app" style="font-family: 'Segoe UI', Arial, sans-serif; border:2px solid #ffcc00; padding:30px; border-radius:15px; text-align:center; background: #1a1a1a; color: white; max-width: 500px; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <h2 style="color:#ffcc00; text-transform: uppercase; letter-spacing: 2px;">OrbitScan AI Scanner</h2>
-    <p style="opacity: 0.8;">Система ИИ-дефектоскопии обшивки</p>
+    <h2 style="color:#ffcc00; text-transform: uppercase; letter-spacing: 2px;">OrbitScan AI Scanner v2.0</h2>
+    <p style="opacity: 0.8;">Система ИИ-анализа космических объектов</p>
     
     <input type="file" id="file-input" accept="image/*" style="display:none;">
     <button onclick="document.getElementById('file-input').click()" style="background:#ffcc00; color:#000; border:none; padding:15px 30px; border-radius:50px; cursor:pointer; font-weight:bold; transition: 0.3s; box-shadow: 0 4px 15px rgba(255,204,0,0.3);">ВЫБРАТЬ СНИМОК</button>
@@ -9,18 +9,17 @@
         <img id="preview" style="max-width:100%; height:200px; display:none; border-radius:8px; margin: 0 auto;">
     </div>
 
-    <div id="result-label" style="font-size:22px; font-weight:bold; margin-top:20px; letter-spacing: 1px;">Ожидание загрузки системы...</div>
+    <div id="result-label" style="font-size:20px; font-weight:bold; margin-top:20px; letter-spacing: 1px;">Ожидание загрузки системы...</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 
 <script>
-    // Твоя ссылка на модель с Teachable Machine
-    const MODEL_URL = "https://teachablemachine.withgoogle.com/models/12f_3hU3C/";
+    // Твоя ОБНОВЛЕННАЯ ссылка на модель с 3 классами
+    const MODEL_URL = "https://teachablemachine.withgoogle.com/models/12f_3hU3C/"; 
     let model;
 
-    // Функция загрузки модели
     async function loadModel() {
         try {
             model = await tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json");
@@ -31,7 +30,6 @@
     }
     loadModel();
 
-    // Логика обработки фото
     document.getElementById('file-input').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -41,7 +39,7 @@
         img.style.display = 'block';
 
         const resultDiv = document.getElementById('result-label');
-        resultDiv.innerHTML = "🛰️ АНАЛИЗ ИЗОБРАЖЕНИЯ...";
+        resultDiv.innerHTML = "🛰️ ИДЕТ ИДЕНТИФИКАЦИЯ...";
         resultDiv.style.color = "#ffcc00";
 
         img.onload = async () => {
@@ -50,7 +48,6 @@
             let topClass = "";
             let topProb = 0;
             
-            // Находим самый вероятный результат
             prediction.forEach(p => {
                 if(p.probability > topProb) {
                     topProb = p.probability;
@@ -58,13 +55,18 @@
                 }
             });
 
-            // Вывод вердикта
+            // ЛОГИКА ДЛЯ 3-Х КЛАССОВ
+            // Важно: проверь, чтобы названия классов в Teachable Machine совпадали (damage / clear / unknown)
             if (topClass === "damage") {
                 resultDiv.innerHTML = "⚠️ ВНИМАНИЕ: ОБНАРУЖЕНО ПОВРЕЖДЕНИЕ!";
                 resultDiv.style.color = "#ff4d4d";
-            } else {
-                resultDiv.innerHTML = "✅ ПОВРЕЖДЕНИЙ НЕ ВЫЯВЛЕНО";
+            } else if (topClass === "clear") {
+                resultDiv.innerHTML = "✅ ОБЪЕКТ ИДЕНТИФИЦИРОВАН: ЦЕЛ";
                 resultDiv.style.color = "#4dff88";
+            } else {
+                // Если сработал третий класс (неизвестный объект)
+                resultDiv.innerHTML = "❓ ОБЪЕКТ НЕ ОПОЗНАН (НЕ СПУТНИК)";
+                resultDiv.style.color = "#aaaaaa";
             }
         };
     });
